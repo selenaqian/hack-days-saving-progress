@@ -1,0 +1,4 @@
+{
+    "game_slug":"<REPO_NAME>",
+    "ssm_param_env": "Prod"
+}

@@ -1,0 +1,4 @@
+feature: 'feature/*'
+bugfix: 'bugfix/*'
+chore: 'chore/*'
+springroll-game: '*'

@@ -1,0 +1,62 @@
+name: Build Springroll Game
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: ${{ github.event.repository.name != 'springroll-game-template' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - name: Get SRC Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SPRINGROLL_GAME_BUILDER_SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -p 7999 git.pbs.org > ~/.ssh/known_hosts
+          chmod 400 ~/.ssh/id_rsa
+
+      - name: "Set up Node"
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+
+      - name: Update game.config.json
+        run: |
+          REPO_NAME="$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')"
+          sed -i "s/<REPO_NAME>/$REPO_NAME/g" build-config/game.config.json
+          cat build-config/game.config.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.SPRINGROLL_GAME_BUILDER_AWS_KEY }}
+          aws-secret-access-key: ${{ secrets.SPRINGROLL_GAME_BUILDER_AWS_SECRET }}
+          aws-region: us-east-1
+
+      - name: NPM install 
+        id: npm_install
+        run: ./build-scripts/npm-install.sh
+
+      - name: Build release and deploy to s3
+        id: build_release
+        run: ./build-scripts/build-release.sh
+
+      - name: Asset Scan
+        id: asset_scan
+        run: ./build-scripts/asset-scan.sh
+
+      - name: Build debug and deploy to s3
+        id: build_debug
+        run: ./build-scripts/build-debug.sh
+
+      - name: Deploy to Springroll
+        id: deploy_to_springroll
+        run: ./build-scripts/deploy-to-springroll.sh
+

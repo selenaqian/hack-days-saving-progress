@@ -1,0 +1,24 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint"],
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "no-cond-assign": 2,
+    "no-import-assign": 2,
+    "no-unreachable": 2,
+    "no-alert": 2,
+    "no-eval": 2,
+    "no-implied-eval": 2,
+    "no-global-assign": 2,
+    "no-script-url": 2,
+    "no-unused-vars": 2,
+    "no-use-before-define": 2
+  }
+}
+
